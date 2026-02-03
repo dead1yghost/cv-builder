@@ -3,8 +3,6 @@ $pageTitle = 'ATS Tarayıcı';
 require_once 'config.php';
 requireLogin();
 
-$result = null;
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check() && isset($_FILES['cv_file'])) {
     $file = $_FILES['cv_file'];
     
@@ -56,7 +54,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check() && isset($_FILES['cv_f
                         json_encode($analysis, JSON_UNESCAPED_UNICODE)
                     ]);
                     
-                    $result = ['score' => $score, 'analysis' => $analysis];
+                    $scanId = db()->lastInsertId();
+                    header('Location: ats-result?id=' . $scanId);
+                    exit;
                 } else {
                     // Görsel tabanlı PDF tespiti
                     $isImageBased = !empty($errorDetails) && 
@@ -349,21 +349,29 @@ veya DOCX formatında yükleyin.
 $analysisData = json_decode($h['analysis_json'], true);
 $isError = isset($analysisData['error']) && $analysisData['error'];
 ?>
-<tr style="border-bottom:1px solid var(--border)">
+<tr style="border-bottom:1px solid var(--border);transition:background 0.2s" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='transparent'">
 <td style="padding:12px">
+<a href="ats-result?id=<?=$h['id']?>" style="text-decoration:none;color:var(--text-dark);font-weight:500">
 <?=e($h['original_filename'])?>
+</a>
 <?php if($isError): ?>
 <br><small style="color:var(--danger)"><i class="fas fa-exclamation-circle"></i> <?=e($analysisData['message'])?></small>
 <?php endif; ?>
 </td>
 <td style="padding:12px;text-align:center">
+<a href="ats-result?id=<?=$h['id']?>" style="text-decoration:none">
 <?php if($isError): ?>
 <span style="background:var(--danger);color:#fff;padding:4px 12px;border-radius:15px;font-weight:600"><i class="fas fa-times"></i> Hata</span>
 <?php else: ?>
 <span style="background:<?=$h['score']>=70?'var(--success)':($h['score']>=50?'var(--warning)':'var(--danger)')?>;color:#fff;padding:4px 12px;border-radius:15px;font-weight:600"><?=$h['score']?>%</span>
 <?php endif; ?>
+</a>
 </td>
-<td style="padding:12px;text-align:right;color:var(--text-muted);font-size:.85rem"><?=date('d.m.Y',strtotime($h['scanned_at']))?></td>
+<td style="padding:12px;text-align:right">
+<a href="ats-result?id=<?=$h['id']?>" class="btn btn-sm" style="background:var(--secondary);color:var(--primary-dark);text-decoration:none">
+<i class="fas fa-eye"></i> Detay
+</a>
+</td>
 </tr>
 <?php endforeach;?>
 </table>
@@ -373,42 +381,16 @@ $isError = isset($analysisData['error']) && $analysisData['error'];
 </div>
 
 <div class="col-6">
-<?php if($result):?>
-<div class="card">
-<div class="card-header"><h3><i class="fas fa-chart-pie"></i> Analiz Sonucu</h3></div>
-<div class="card-body">
-<div class="text-center mb-2">
-<div class="score-circle <?=$result['score']>=80?'excellent':($result['score']>=60?'good':($result['score']>=40?'average':'poor'))?>">
-<?=$result['score']?>%
-</div>
-<h3><?=$result['score']>=80?'Mükemmel!':($result['score']>=60?'İyi':($result['score']>=40?'Ortalama':'Geliştirme Gerekli'))?></h3>
-</div>
-
-<?php foreach($result['analysis'] as $key => $data):?>
-<div class="analysis-item <?=$data['score']>=70?'success':($data['score']>=40?'warning':'danger')?>">
-<h4>
-<span><?=ucfirst($key)?></span>
-<span><?=$data['score']?>%</span>
-</h4>
-<?php if(isset($data['found']) && $data['found']):?>
-<p><i class="fas fa-check"></i> <?=implode(', ', $data['found'])?></p>
-<?php endif;?>
-<?php if(isset($data['suggestions']) && $data['suggestions']):?>
-<p style="margin-top:5px"><i class="fas fa-lightbulb"></i> <?=implode(' ', $data['suggestions'])?></p>
-<?php endif;?>
-</div>
-<?php endforeach;?>
-</div>
-</div>
-<?php else:?>
 <div class="card">
 <div class="card-body text-center" style="padding:60px">
 <i class="fas fa-file-search" style="font-size:4rem;color:var(--text-muted);margin-bottom:20px"></i>
 <h3>CV'nizi Analiz Edin</h3>
 <p class="text-muted">Sol taraftan CV dosyanızı yükleyin ve ATS uyumluluk skorunuzu görün.</p>
+<p style="margin-top:20px;color:var(--text-muted);font-size:.9rem">
+<i class="fas fa-info-circle"></i> Analiz tamamlandığında detaylı sonuç sayfasına yönlendirileceksiniz.
+</p>
 </div>
 </div>
-<?php endif;?>
 </div>
 </div>
 </div>
