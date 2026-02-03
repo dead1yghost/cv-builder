@@ -37,7 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check() && $validToken) {
     $newPassword = $_POST['new_password'] ?? '';
     $newPassword2 = $_POST['new_password2'] ?? '';
     
-    if (empty($newPassword)) {
+    // Check rate limiting for password reset attempts
+    $rateLimit = checkPasswordResetRateLimit($user['email']);
+    if (!$rateLimit['allowed']) {
+        $error = $rateLimit['message'];
+    } elseif (empty($newPassword)) {
         $error = 'Yeni şifre gereklidir.';
     } elseif (strlen($newPassword) < 6) {
         $error = 'Şifre en az 6 karakter olmalıdır.';

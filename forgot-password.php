@@ -19,11 +19,21 @@ $success = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check()) {
     $email = trim($_POST['email'] ?? '');
     
-    if (empty($email)) {
+    // Honeypot bot protection (hidden field that bots will fill)
+    $honeypot = $_POST['website'] ?? '';
+    if (!empty($honeypot)) {
+        // Bot detected, silently fail
+        $success = "Eğer bu e-posta adresi sistemde kayıtlıysa, şifre sıfırlama linki gönderilecektir.";
+    } elseif (empty($email)) {
         $error = 'E-posta adresi gereklidir.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Geçerli bir e-posta adresi girin.';
     } else {
+        // Check rate limiting
+        $rateLimit = checkPasswordResetRateLimit($email);
+        if (!$rateLimit['allowed']) {
+            $error = $rateLimit['message'];
+        } else {
         // Check if user exists
         $stmt = db()->prepare("SELECT id, full_name FROM users WHERE email = ?");
         $stmt->execute([$email]);
@@ -98,9 +108,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check()) {
                            <a href='$resetLink' style='color: var(--primary);'>$resetLink</a><br><br>
                            <small style='color: var(--text-muted);'>E-posta gönderimi devre dışı. Config.php'den MAIL_ENABLED'ı aktif edin.</small>";
             }
+            // Record this attempt for rate limiting
+            recordPasswordResetAttempt($email);
         } else {
             // Don't reveal if email exists or not (security)
             $success = "Eğer bu e-posta adresi sistemde kayıtlıysa, şifre sıfırlama linki gönderilecektir.";
+        }
         }
     }
 }
@@ -131,6 +144,9 @@ require_once 'header.php';
                     <?php if (!$success): ?>
                     <form method="POST">
                         <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                        
+                        <!-- Honeypot field for bot protection (hidden from users) -->
+                        <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off">
                         
                         <div class="form-group">
                             <label class="form-label">E-posta Adresi</label>

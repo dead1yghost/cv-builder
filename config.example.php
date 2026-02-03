@@ -36,6 +36,12 @@ define('MAX_PHOTO_SIZE', 2 * 1024 * 1024);  // 2MB
 // Features
 define('ENABLE_PASSWORD_RESET', true); // Şifre sıfırlama özelliğini aktif/pasif yap
 
+// Rate Limiting (Bot Protection)
+define('RATE_LIMIT_ENABLED', true); // Rate limiting aktif/pasif
+define('RATE_LIMIT_MAX_ATTEMPTS', 3); // Maksimum deneme sayısı
+define('RATE_LIMIT_WINDOW', 15); // Dakika cinsinden süre penceresi
+define('RATE_LIMIT_COOLDOWN', 60); // Limit aşıldığında bekleme süresi (dakika)
+
 // Email Configuration (Hostinger SMTP)
 // Şifre sıfırlama için e-posta gönderimi
 define('MAIL_ENABLED', false); // E-posta gönderimi aktif/pasif (üretimde true yapın)
@@ -159,6 +165,88 @@ function sendMail($to, $subject, $message) {
     $success = mail($to, $subject, $message, implode("\r\n", $headers));
     
     return $success;
+}
+
+/**
+ * Get user's IP address
+ * @return string IP address
+ */
+function getUserIP() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        return $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+        return $_SERVER['REMOTE_ADDR'];
+    }
+}
+
+/**
+ * Check if rate limit is exceeded for password reset
+ * @param string $email Email address
+ * @return array ['allowed' => bool, 'message' => string, 'wait_time' => int]
+ */
+function checkPasswordResetRateLimit($email) {
+    if (!RATE_LIMIT_ENABLED) {
+        return ['allowed' => true, 'message' => '', 'wait_time' => 0];
+    }
+    
+    $ip = getUserIP();
+    $now = date('Y-m-d H:i:s');
+    
+    // Clean old attempts (older than cooldown period)
+    $cleanupTime = date('Y-m-d H:i:s', strtotime('-' . RATE_LIMIT_COOLDOWN . ' minutes'));
+    $stmt = db()->prepare("DELETE FROM password_reset_attempts WHERE attempt_time < ?");
+    $stmt->execute([$cleanupTime]);
+    
+    // Check attempts in the time window
+    $windowStart = date('Y-m-d H:i:s', strtotime('-' . RATE_LIMIT_WINDOW . ' minutes'));
+    
+    // Check by IP
+    $stmt = db()->prepare("SELECT COUNT(*) as count, MIN(attempt_time) as first_attempt 
+                          FROM password_reset_attempts 
+                          WHERE ip_address = ? AND attempt_time > ?");
+    $stmt->execute([$ip, $windowStart]);
+    $ipAttempts = $stmt->fetch();
+    
+    // Check by email
+    $stmt = db()->prepare("SELECT COUNT(*) as count, MIN(attempt_time) as first_attempt 
+                          FROM password_reset_attempts 
+                          WHERE email = ? AND attempt_time > ?");
+    $stmt->execute([$email, $windowStart]);
+    $emailAttempts = $stmt->fetch();
+    
+    $maxAttempts = max($ipAttempts['count'], $emailAttempts['count']);
+    
+    if ($maxAttempts >= RATE_LIMIT_MAX_ATTEMPTS) {
+        $firstAttempt = min($ipAttempts['first_attempt'], $emailAttempts['first_attempt']);
+        $waitUntil = strtotime($firstAttempt) + (RATE_LIMIT_WINDOW * 60);
+        $waitMinutes = ceil(($waitUntil - time()) / 60);
+        
+        return [
+            'allowed' => false,
+            'message' => "Çok fazla deneme yaptınız. Lütfen $waitMinutes dakika sonra tekrar deneyin.",
+            'wait_time' => $waitMinutes
+        ];
+    }
+    
+    return ['allowed' => true, 'message' => '', 'wait_time' => 0];
+}
+
+/**
+ * Record password reset attempt
+ * @param string $email Email address
+ */
+function recordPasswordResetAttempt($email) {
+    if (!RATE_LIMIT_ENABLED) {
+        return;
+    }
+    
+    $ip = getUserIP();
+    $now = date('Y-m-d H:i:s');
+    
+    $stmt = db()->prepare("INSERT INTO password_reset_attempts (ip_address, email, attempt_time) VALUES (?, ?, ?)");
+    $stmt->execute([$ip, $email, $now]);
 }
 
 // Dizinleri oluştur
