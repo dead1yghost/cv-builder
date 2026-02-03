@@ -83,6 +83,31 @@ Hostinger Git panelinde **Pull** butonuna tıklayarak ilk deployment'ı yapın.
 Her `main` branch'e push yaptığınızda, Hostinger'da manuel olarak **Pull** yapmanız gerekir.
 Tam otomatik deployment için Hostinger'ın webhook özelliğini kullanabilirsiniz.
 
+## Geliştirme İş Akışı (Git Workflow)
+
+Projede iki branch kullanılıyor:
+- **`main`**: Production branch - Hostinger'a deploy edilir
+- **`develop`**: Development branch - Yerel testler için
+
+### Develop Branch'te Çalışma
+
+```bash
+# Develop branch'e geç
+git checkout develop
+
+# Değişikliklerini yap ve commit et
+git add .
+git commit -m "Yeni özellik eklendi"
+git push origin develop
+
+# Testler başarılı olduğunda main'e merge et
+git checkout main
+git merge develop
+git push origin main
+```
+
+Hostinger'da **Pull** yaparak production'a deploy et.
+
 ### 5. Test Et
 
 Tarayıcıdan `https://cv-builder.isimizcozum.com` adresine gidin.
