@@ -58,14 +58,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check() && isset($_FILES['cv_f
                     
                     $result = ['score' => $score, 'analysis' => $analysis];
                 } else {
-                    $errorMsg = 'Dosyadan metin çıkarılamadı.';
-                    if (!empty($errorDetails)) {
-                        $errorMsg .= ' Detay: ' . implode(', ', $errorDetails);
+                    // Görsel tabanlı PDF tespiti
+                    $isImageBased = !empty($errorDetails) && 
+                                   (in_array('Parser metin bulamadı', $errorDetails) || 
+                                    in_array('PDF görsel tabanlı veya şifreli olabilir', $errorDetails));
+                    
+                    if ($isImageBased) {
+                        flash('warning', 'PDF dosyanız görsel tabanlı (taranmış belge). ATS sistemleri bu dosyaları okuyamaz. <a href="pdf-help.php" style="color:#856404;text-decoration:underline;font-weight:600">Nasıl düzeltebileceğinizi öğrenin</a> veya DOCX formatında yükleyin.');
+                    } else {
+                        $errorMsg = 'Dosyadan metin çıkarılamadı.';
+                        if (!empty($errorDetails)) {
+                            $errorMsg .= ' Detay: ' . implode(', ', $errorDetails);
+                        }
+                        flash('danger', $errorMsg);
                     }
-                    if (strlen($text) > 0 && strlen($text) <= 10) {
-                        $errorMsg .= ' PDF çok az metin içeriyor veya görsel tabanlı olabilir.';
-                    }
-                    flash('danger', $errorMsg);
                 }
             }
         } else {
@@ -294,6 +300,18 @@ require_once 'header.php';
 <input type="file" name="cv_file" id="cv_file" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="document.getElementById('uploadForm').submit()">
 </div>
 </form>
+
+<div style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:15px;margin-top:20px">
+<h4 style="margin:0 0 10px;color:#856404"><i class="fas fa-info-circle"></i> Önemli Bilgi</h4>
+<p style="margin:0 0 10px;font-size:.9rem;color:#856404">
+<strong>Görsel tabanlı PDF'ler (taranmış belgeler) analiz edilemez.</strong> 
+Gerçek ATS sistemleri de bu tür dosyaları okuyamaz ve başvurunuz reddedilebilir.
+</p>
+<p style="margin:0;font-size:.9rem;color:#856404">
+<strong>✅ Önerilen:</strong> CV'nizi Word/Google Docs'ta oluşturun ve oradan PDF olarak kaydedin, 
+veya DOCX formatında yükleyin.
+</p>
+</div>
 </div>
 </div>
 
