@@ -20,19 +20,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check() && isset($_FILES['cv_f
             if (move_uploaded_file($file['tmp_name'], $filepath)) {
                 // Extract text based on file type
                 $text = '';
+                $errorDetails = [];
                 
                 if ($ext === 'txt') {
                     $text = file_get_contents($filepath);
                 } elseif ($ext === 'pdf') {
-                    // Use PHP PDF parser library
-                    require_once __DIR__ . '/vendor/autoload.php';
-                    try {
-                        $parser = new \Smalot\PdfParser\Parser();
-                        $pdf = $parser->parseFile($filepath);
-                        $text = $pdf->getText();
-                    } catch (Exception $e) {
-                        $text = '';
-                    }
+                    $extractResult = extractPDFText($filepath);
+                    $text = $extractResult['text'];
+                    $errorDetails = $extractResult['errors'];
                 } elseif ($ext === 'docx') {
                     $zip = new ZipArchive();
                     if ($zip->open($filepath) === true) {
@@ -42,7 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check() && isset($_FILES['cv_f
                     }
                 }
                 
-                if (!empty($text)) {
+                // Trim and check if we have meaningful text
+                $text = trim($text);
+                
+                if (!empty($text) && strlen($text) > 10) {
                     // Analyze the CV
                     $analysis = analyzeCVText($text);
                     $score = calculateATSScore($analysis);
@@ -60,13 +58,120 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check() && isset($_FILES['cv_f
                     
                     $result = ['score' => $score, 'analysis' => $analysis];
                 } else {
-                    flash('danger', 'Dosyadan metin çıkarılamadı.');
+                    $errorMsg = 'Dosyadan metin çıkarılamadı.';
+                    if (!empty($errorDetails)) {
+                        $errorMsg .= ' Detay: ' . implode(', ', $errorDetails);
+                    }
+                    if (strlen($text) > 0 && strlen($text) <= 10) {
+                        $errorMsg .= ' PDF çok az metin içeriyor veya görsel tabanlı olabilir.';
+                    }
+                    flash('danger', $errorMsg);
                 }
             }
         } else {
             flash('danger', 'Geçersiz dosya türü veya boyutu.');
         }
     }
+}
+
+/**
+ * PDF'den metin çıkarma fonksiyonu - ATS sistemleri gibi çoklu yöntem dener
+ */
+function extractPDFText($filepath) {
+    $text = '';
+    $errors = [];
+    
+    if (!file_exists($filepath)) {
+        return ['text' => '', 'errors' => ['Dosya bulunamadı']];
+    }
+    
+    // Method 1: Smalot PDF Parser (En yaygın kullanılan)
+    try {
+        require_once __DIR__ . '/vendor/autoload.php';
+        $parser = new \Smalot\PdfParser\Parser();
+        $pdf = $parser->parseFile($filepath);
+        $text = $pdf->getText();
+        
+        // Başarılı ve yeterli metin varsa döndür
+        if (!empty(trim($text)) && strlen(trim($text)) > 50) {
+            return ['text' => $text, 'errors' => []];
+        }
+        
+        // Az metin çıktıysa, sayfa sayfa dene
+        $pages = $pdf->getPages();
+        $pageTexts = [];
+        foreach ($pages as $page) {
+            $pageText = $page->getText();
+            if (!empty(trim($pageText))) {
+                $pageTexts[] = $pageText;
+            }
+        }
+        
+        if (!empty($pageTexts)) {
+            $text = implode("\n\n", $pageTexts);
+            if (strlen(trim($text)) > 50) {
+                return ['text' => $text, 'errors' => []];
+            }
+        }
+        
+        $errors[] = 'Parser metin bulamadı';
+        
+    } catch (Exception $e) {
+        $errors[] = 'Parser hatası: ' . $e->getMessage();
+    }
+    
+    // Method 2: Raw PDF content extraction (fallback)
+    // Bazı PDF'ler için ham içerik okuma işe yarayabilir
+    try {
+        $content = file_get_contents($filepath);
+        
+        // PDF stream objelerinden metin çıkar
+        if (preg_match_all('/\(([^)]+)\)/s', $content, $matches)) {
+            $extractedText = implode(' ', $matches[1]);
+            $extractedText = preg_replace('/[\x00-\x1F\x7F]/u', '', $extractedText);
+            
+            if (!empty(trim($extractedText)) && strlen(trim($extractedText)) > 50) {
+                return ['text' => $extractedText, 'errors' => []];
+            }
+        }
+        
+        // BT/ET blokları arasındaki metni çıkar (PDF text objects)
+        if (preg_match_all('/BT\s+(.*?)\s+ET/s', $content, $matches)) {
+            $extractedText = '';
+            foreach ($matches[1] as $block) {
+                // Tj ve TJ operatörlerinden metin çıkar
+                if (preg_match_all('/\[([^\]]+)\]\s*TJ|\(([^)]+)\)\s*Tj/s', $block, $textMatches)) {
+                    foreach ($textMatches[1] as $t) {
+                        if (!empty($t)) {
+                            $extractedText .= $t . ' ';
+                        }
+                    }
+                    foreach ($textMatches[2] as $t) {
+                        if (!empty($t)) {
+                            $extractedText .= $t . ' ';
+                        }
+                    }
+                }
+            }
+            
+            $extractedText = preg_replace('/[\x00-\x1F\x7F]/u', '', $extractedText);
+            if (!empty(trim($extractedText)) && strlen(trim($extractedText)) > 50) {
+                return ['text' => $extractedText, 'errors' => []];
+            }
+        }
+        
+        $errors[] = 'Ham içerik okuma başarısız';
+        
+    } catch (Exception $e) {
+        $errors[] = 'Ham okuma hatası: ' . $e->getMessage();
+    }
+    
+    // Hiçbir yöntem işe yaramadıysa
+    if (empty(trim($text))) {
+        $errors[] = 'PDF görsel tabanlı veya şifreli olabilir';
+    }
+    
+    return ['text' => $text, 'errors' => $errors];
 }
 
 function analyzeCVText($text) {
