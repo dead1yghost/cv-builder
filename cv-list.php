@@ -23,7 +23,7 @@ require_once 'header.php';
 
 <div class="container">
 <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
-<a href="cv-create.php" class="btn btn-primary"><i class="fas fa-plus"></i> Yeni CV Oluştur</a>
+<a href="cv-create" class="btn btn-primary"><i class="fas fa-plus"></i> Yeni CV Oluştur</a>
 </div>
 
 <?php if(empty($cvs)):?>
@@ -31,7 +31,7 @@ require_once 'header.php';
 <i class="fas fa-file-alt" style="font-size:4rem;color:var(--text-muted);margin-bottom:20px"></i>
 <h3>Henüz CV oluşturmadınız</h3>
 <p class="text-muted">İlk CV'nizi oluşturmak için butona tıklayın.</p>
-<a href="cv-create.php" class="btn btn-primary btn-lg mt-2"><i class="fas fa-plus"></i> CV Oluştur</a>
+<a href="cv-create" class="btn btn-primary btn-lg mt-2"><i class="fas fa-plus"></i> CV Oluştur</a>
 </div></div>
 <?php else:?>
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:25px">
@@ -45,10 +45,10 @@ require_once 'header.php';
 <p class="text-muted" style="font-size:.9rem;margin:0 0 15px"><?=e($cv['cv_title']?:'Başlık belirtilmemiş')?><br>
 <small>Son güncelleme: <?=date('d.m.Y H:i',strtotime($cv['updated_at']))?></small></p>
 <div style="display:flex;gap:8px;flex-wrap:wrap">
-<a href="cv-edit.php?id=<?=$cv['id']?>" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Düzenle</a>
-<a href="cv-preview.php?id=<?=$cv['id']?>" class="btn btn-sm btn-secondary" target="_blank"><i class="fas fa-eye"></i></a>
-<a href="cv-download.php?id=<?=$cv['id']?>&type=pdf" class="btn btn-sm btn-success"><i class="fas fa-download"></i></a>
-<a href="cv-delete.php?id=<?=$cv['id']?>" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?')"><i class="fas fa-trash"></i></a>
+<a href="cv-edit?id=<?=$cv['id']?>" class="btn btn-sm btn-primary"><i class="fas fa-edit"></i> Düzenle</a>
+<a href="cv-preview?id=<?=$cv['id']?>" class="btn btn-sm btn-secondary" target="_blank"><i class="fas fa-eye"></i></a>
+<a href="cv-download?id=<?=$cv['id']?>&type=pdf" class="btn btn-sm btn-success"><i class="fas fa-download"></i></a>
+<a href="cv-delete?id=<?=$cv['id']?>" class="btn btn-sm btn-danger" onclick="return confirm('Silmek istediğinize emin misiniz?')"><i class="fas fa-trash"></i></a>
 </div>
 </div>
 </div>

@@ -2,7 +2,7 @@
 $pageTitle = 'Kayıt Ol';
 require_once 'config.php';
 
-if (isLoggedIn()) redirect('dashboard.php');
+if (isLoggedIn()) redirect('dashboard');
 
 $error = '';
 $success = '';
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$email, $hashedPassword, $fullName, $phone]);
                 
                 flash('success', 'Kayıt başarılı! Giriş yapabilirsiniz.');
-                redirect('login.php');
+                redirect('login');
             }
         }
     }
@@ -102,7 +102,7 @@ require_once 'header.php';
                     </form>
                     
                     <p class="text-center mt-2">
-                        Zaten hesabınız var mı? <a href="login.php">Giriş Yapın</a>
+                        Zaten hesabınız var mı? <a href="login">Giriş Yapın</a>
                     </p>
                 </div>
             </div>

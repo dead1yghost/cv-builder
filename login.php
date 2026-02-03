@@ -2,7 +2,7 @@
 $pageTitle = 'Giriş Yap';
 require_once 'config.php';
 
-if (isLoggedIn()) redirect('dashboard.php');
+if (isLoggedIn()) redirect('dashboard');
 
 $error = '';
 
@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([$user['id']]);
                 
                 flash('success', 'Hoş geldiniz, ' . $user['full_name'] . '!');
-                redirect('dashboard.php');
+                redirect('dashboard');
             } else {
                 $error = 'E-posta veya şifre hatalı.';
             }
@@ -78,7 +78,7 @@ require_once 'header.php';
                     </form>
                     
                     <p class="text-center mt-2">
-                        Hesabınız yok mu? <a href="register.php">Kayıt Olun</a>
+                        Hesabınız yok mu? <a href="register">Kayıt Olun</a>
                     </p>
                 </div>
             </div>

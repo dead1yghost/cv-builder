@@ -18,4 +18,4 @@ if ($cv) {
     flash('success', 'CV silindi.');
 }
 
-redirect('dashboard.php');
+redirect('dashboard');

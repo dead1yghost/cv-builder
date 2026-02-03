@@ -39,17 +39,17 @@ require_once 'header.php';
         <p>Profesyonel, ATS tarayıcı dostu CV'ler oluşturun. İş başvurularınızda öne çıkın!</p>
         <div class="hero-buttons">
             <?php if (isLoggedIn()): ?>
-                <a href="dashboard.php" class="btn btn-primary btn-lg">
+                <a href="dashboard" class="btn btn-primary btn-lg">
                     <i class="fas fa-plus"></i> CV Oluştur
                 </a>
-                <a href="ats-scanner.php" class="btn btn-outline" style="background:white;">
+                <a href="ats-scanner" class="btn btn-outline" style="background:white;">
                     <i class="fas fa-search"></i> ATS Skoru Öğren
                 </a>
             <?php else: ?>
-                <a href="register.php" class="btn btn-primary btn-lg">
+                <a href="register" class="btn btn-primary btn-lg">
                     <i class="fas fa-rocket"></i> Ücretsiz Başla
                 </a>
-                <a href="login.php" class="btn btn-outline" style="background:white;">
+                <a href="login" class="btn btn-outline" style="background:white;">
                     <i class="fas fa-sign-in-alt"></i> Giriş Yap
                 </a>
             <?php endif; ?>
@@ -131,11 +131,11 @@ require_once 'header.php';
         <h2>Hemen Profesyonel CV'nizi Oluşturun!</h2>
         <p style="opacity:0.9; margin-bottom:25px;">Ücretsiz, hızlı ve kolay.</p>
         <?php if (!isLoggedIn()): ?>
-            <a href="register.php" class="btn btn-primary btn-lg">
+            <a href="register" class="btn btn-primary btn-lg">
                 <i class="fas fa-user-plus"></i> Ücretsiz Kayıt Ol
             </a>
         <?php else: ?>
-            <a href="cv-create.php" class="btn btn-primary btn-lg">
+            <a href="cv-create" class="btn btn-primary btn-lg">
                 <i class="fas fa-plus"></i> Yeni CV Oluştur
             </a>
         <?php endif; ?>

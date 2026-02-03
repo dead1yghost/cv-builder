@@ -82,7 +82,7 @@ require_once 'header.php';
 <div class="step-box">
 <h4>Yöntem 4: CV'nizi Sıfırdan Oluşturun</h4>
 <ol style="margin:10px 0 0;padding-left:20px">
-<li>Sitemizin <a href="cv-create.php">CV Oluşturucu</a> özelliğini kullanın</li>
+<li>Sitemizin <a href="cv-create">CV Oluşturucu</a> özelliğini kullanın</li>
 <li>Bilgilerinizi girin ve ATS uyumlu CV oluşturun</li>
 <li>Otomatik olarak metin tabanlı PDF indirebilirsiniz</li>
 </ol>
@@ -114,8 +114,8 @@ require_once 'header.php';
 </div>
 
 <div style="text-align:center;margin:30px 0">
-<a href="ats-scanner.php" class="btn btn-primary"><i class="fas fa-arrow-left"></i> ATS Scanner'a Dön</a>
-<a href="cv-create.php" class="btn btn-success"><i class="fas fa-plus"></i> Yeni CV Oluştur</a>
+<a href="ats-scanner" class="btn btn-primary"><i class="fas fa-arrow-left"></i> ATS Scanner'a Dön</a>
+<a href="cv-create" class="btn btn-success"><i class="fas fa-plus"></i> Yeni CV Oluştur</a>
 </div>
 </div>
 

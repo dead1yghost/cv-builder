@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check()) {
         db()->commit();
         
         flash('success', 'CV oluşturuldu! Şimdi bilgilerinizi ekleyin.');
-        redirect("cv-edit.php?id=$cvId");
+        redirect("cv-edit?id=$cvId");
     } catch (Exception $e) {
         db()->rollBack();
         flash('danger', 'CV oluşturulurken bir hata oluştu.');

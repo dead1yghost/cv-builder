@@ -79,12 +79,12 @@ require_once 'header.php';
     <!-- CVs -->
     <div class="section-title">
         <h2><i class="fas fa-file-alt"></i> CV'lerim</h2>
-        <a href="cv-create.php" class="btn btn-primary"><i class="fas fa-plus"></i> Yeni CV</a>
+        <a href="cv-create" class="btn btn-primary"><i class="fas fa-plus"></i> Yeni CV</a>
     </div>
     
     <div class="cv-grid">
         <!-- New CV Card -->
-        <a href="cv-create.php" class="new-cv-card card">
+        <a href="cv-create" class="new-cv-card card">
             <i class="fas fa-plus-circle"></i>
             <span style="font-size:1.1rem;">Yeni CV Oluştur</span>
         </a>
@@ -101,13 +101,13 @@ require_once 'header.php';
                     <small>Son güncelleme: <?= date('d.m.Y H:i', strtotime($cv['updated_at'])) ?></small>
                 </p>
                 <div class="cv-actions">
-                    <a href="cv-edit.php?id=<?= $cv['id'] ?>" class="btn btn-sm btn-primary">
+                    <a href="cv-edit?id=<?= $cv['id'] ?>" class="btn btn-sm btn-primary">
                         <i class="fas fa-edit"></i> Düzenle
                     </a>
-                    <a href="cv-preview.php?id=<?= $cv['id'] ?>" class="btn btn-sm btn-secondary" target="_blank">
+                    <a href="cv-preview?id=<?= $cv['id'] ?>" class="btn btn-sm btn-secondary" target="_blank">
                         <i class="fas fa-eye"></i> Önizle
                     </a>
-                    <a href="cv-download.php?id=<?= $cv['id'] ?>&type=pdf" class="btn btn-sm btn-success">
+                    <a href="cv-download?id=<?= $cv['id'] ?>&type=pdf" class="btn btn-sm btn-success">
                         <i class="fas fa-download"></i> PDF
                     </a>
                 </div>
@@ -120,7 +120,7 @@ require_once 'header.php';
     <?php if ($scans): ?>
     <div class="section-title mt-2" style="margin-top:40px;">
         <h2><i class="fas fa-search"></i> Son ATS Taramaları</h2>
-        <a href="ats-scanner.php" class="btn btn-outline"><i class="fas fa-plus"></i> Yeni Tarama</a>
+        <a href="ats-scanner" class="btn btn-outline"><i class="fas fa-plus"></i> Yeni Tarama</a>
     </div>
     
     <div class="card">
@@ -145,7 +145,7 @@ require_once 'header.php';
                         </td>
                         <td style="padding:15px;"><?= date('d.m.Y H:i', strtotime($scan['scanned_at'])) ?></td>
                         <td style="padding:15px; text-align:right;">
-                            <a href="ats-result.php?id=<?= $scan['id'] ?>" class="btn btn-sm btn-outline">Detay</a>
+                            <a href="ats-result?id=<?= $scan['id'] ?>" class="btn btn-sm btn-outline">Detay</a>
                         </td>
                     </tr>
                     <?php endforeach; ?>

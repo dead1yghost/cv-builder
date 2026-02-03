@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check()) {
     if ($action === 'save_personal') {
         $stmt = db()->prepare("UPDATE cv_personal_info SET full_name=?, title=?, email=?, phone=?, city=?, birth_year=?, linkedin=?, summary=?, nationality=?, military_status=?, driving_license=? WHERE cv_id=?");
         $stmt->execute([$_POST['full_name'],$_POST['title'],$_POST['email'],$_POST['phone'],$_POST['city'],$_POST['birth_year']?:null,$_POST['linkedin'],$_POST['summary'],$_POST['nationality'],$_POST['military_status'],$_POST['driving_license'],$cvId]);
-        flash('success','Kaydedildi!'); redirect("cv-edit.php?id=$cvId");
+        flash('success','Kaydedildi!'); redirect("cv-edit?id=$cvId");
     }
     if ($action === 'save_settings') {
         $stmt = db()->prepare("UPDATE cvs SET title=?, theme_color=?, show_photo=? WHERE id=?");
@@ -316,7 +316,7 @@ require_once 'header.php';
 <button type="submit" class="btn btn-primary btn-lg"><i class="fas fa-save"></i> Kaydet</button>
 </form>
 <hr style="margin:30px 0">
-<a href="cv-delete.php?id=<?=$cvId?>" class="btn btn-danger" onclick="return confirm('CV silinsin mi?')"><i class="fas fa-trash"></i> CV\'yi Sil</a>
+<a href="cv-delete?id=<?=$cvId?>" class="btn btn-danger" onclick="return confirm('CV silinsin mi?')"><i class="fas fa-trash"></i> CV'yi Sil</a>
 </div></div>
 </div>
 
