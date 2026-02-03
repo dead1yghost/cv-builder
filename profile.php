@@ -12,29 +12,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check()) {
     
     if ($action === 'update_profile') {
         $fullName = trim($_POST['full_name'] ?? '');
-        $email = trim($_POST['email'] ?? '');
         $phone = trim($_POST['phone'] ?? '');
         
-        if (empty($fullName) || empty($email)) {
-            $error = 'Ad Soyad ve E-posta zorunludur.';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = 'Geçerli bir e-posta adresi girin.';
+        if (empty($fullName)) {
+            $error = 'Ad Soyad zorunludur.';
         } else {
-            // Check if email is already used by another user
-            $stmt = db()->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
-            $stmt->execute([$email, $_SESSION['user_id']]);
-            if ($stmt->fetch()) {
-                $error = 'Bu e-posta adresi başka bir kullanıcı tarafından kullanılıyor.';
-            } else {
-                $stmt = db()->prepare("UPDATE users SET full_name = ?, email = ?, phone = ? WHERE id = ?");
-                $stmt->execute([$fullName, $email, $phone, $_SESSION['user_id']]);
-                
-                $_SESSION['user_name'] = $fullName;
-                $_SESSION['user_email'] = $email;
-                
-                flash('success', 'Profil bilgileriniz güncellendi.');
-                redirect('profile');
-            }
+            $stmt = db()->prepare("UPDATE users SET full_name = ?, phone = ? WHERE id = ?");
+            $stmt->execute([$fullName, $phone, $_SESSION['user_id']]);
+            
+            $_SESSION['user_name'] = $fullName;
+            
+            flash('success', 'Profil bilgileriniz güncellendi.');
+            redirect('profile');
         }
     }
     
@@ -111,9 +100,12 @@ require_once 'header.php';
                         </div>
                         
                         <div class="form-group">
-                            <label class="form-label">E-posta *</label>
-                            <input type="email" name="email" class="form-control" required 
+                            <label class="form-label">E-posta</label>
+                            <input type="email" class="form-control" disabled 
                                    value="<?= e($user['email']) ?>">
+                            <small style="color: var(--text-muted); display: block; margin-top: 5px;">
+                                <i class="fas fa-info-circle"></i> E-posta adresi değiştirilemez.
+                            </small>
                         </div>
                         
                         <div class="form-group">

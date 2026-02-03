@@ -78,6 +78,10 @@ require_once 'header.php';
                     </form>
                     
                     <p class="text-center mt-2">
+                        <a href="forgot-password"><i class="fas fa-key"></i> Şifremi Unuttum</a>
+                    </p>
+                    
+                    <p class="text-center mt-2">
                         Hesabınız yok mu? <a href="register">Kayıt Olun</a>
                     </p>
                 </div>
