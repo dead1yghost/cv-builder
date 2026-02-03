@@ -102,18 +102,18 @@
 <body>
     <nav class="navbar">
         <div class="container">
-            <a href="index.php" class="navbar-brand">
+            <a href="/" class="navbar-brand">
                 <i class="fas fa-file-alt"></i> CV Builder Pro
             </a>
             <ul class="navbar-nav">
                 <?php if (isLoggedIn()): ?>
-                    <li><a href="dashboard.php"><i class="fas fa-th-large"></i> Dashboard</a></li>
-                    <li><a href="cv-list.php"><i class="fas fa-file-alt"></i> CV'lerim</a></li>
-                    <li><a href="ats-scanner.php"><i class="fas fa-search"></i> ATS Tarayıcı</a></li>
-                    <li><a href="logout.php"><i class="fas fa-sign-out-alt"></i> Çıkış</a></li>
+                    <li><a href="dashboard"><i class="fas fa-th-large"></i> Dashboard</a></li>
+                    <li><a href="cv-list"><i class="fas fa-file-alt"></i> CV'lerim</a></li>
+                    <li><a href="ats-scanner"><i class="fas fa-search"></i> ATS Tarayıcı</a></li>
+                    <li><a href="logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a></li>
                 <?php else: ?>
-                    <li><a href="login.php"><i class="fas fa-sign-in-alt"></i> Giriş</a></li>
-                    <li><a href="register.php" class="btn-nav"><i class="fas fa-user-plus"></i> Kayıt Ol</a></li>
+                    <li><a href="login"><i class="fas fa-sign-in-alt"></i> Giriş</a></li>
+                    <li><a href="register" class="btn-nav"><i class="fas fa-user-plus"></i> Kayıt Ol</a></li>
                 <?php endif; ?>
             </ul>
         </div>
