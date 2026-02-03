@@ -78,10 +78,11 @@ composer install
 
 Hostinger Git panelinde **Pull** butonuna tıklayarak ilk deployment'ı yapın.
 
-### 4. Otomatik Deployment
+### 4. Otomatik Deployment (Webhook Aktif ✅)
 
-Her `main` branch'e push yaptığınızda, Hostinger'da manuel olarak **Pull** yapmanız gerekir.
-Tam otomatik deployment için Hostinger'ın webhook özelliğini kullanabilirsiniz.
+Webhook kurulumu tamamlandı! Artık `main` branch'e her push yaptığınızda, Hostinger otomatik olarak değişiklikleri çekip deploy edecek.
+
+Manuel deployment gerekirse Hostinger Git panelinde **Pull** butonunu kullanabilirsiniz.
 
 ## Geliştirme İş Akışı (Git Workflow)
 
@@ -106,7 +107,7 @@ git merge develop
 git push origin main
 ```
 
-Hostinger'da **Pull** yaparak production'a deploy et.
+**Webhook sayesinde otomatik olarak Hostinger'a deploy edilecek!** ✅
 
 ### 5. Test Et
 
