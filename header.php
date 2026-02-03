@@ -122,6 +122,9 @@
     <main>
     <?php if ($flash = flash()): ?>
         <div class="container" style="margin-top:20px;">
-            <div class="alert alert-<?= $flash['type'] ?>"><?= e($flash['message']) ?></div>
+            <div class="alert alert-<?= $flash['type'] ?>" id="flashMessage">
+                <button type="button" style="float:right;background:none;border:none;font-size:1.5rem;cursor:pointer;opacity:0.6;line-height:1" onclick="this.parentElement.parentElement.remove()">&times;</button>
+                <?= $flash['message'] ?>
+            </div>
         </div>
     <?php endif; ?>

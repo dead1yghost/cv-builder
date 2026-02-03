@@ -63,6 +63,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check() && isset($_FILES['cv_f
                                    (in_array('Parser metin bulamadı', $errorDetails) || 
                                     in_array('PDF görsel tabanlı veya şifreli olabilir', $errorDetails));
                     
+                    // Başarısız taramayı da kaydet
+                    $errorAnalysis = ['error' => true, 'message' => $isImageBased ? 'Görsel tabanlı PDF' : 'Metin çıkarılamadı'];
+                    $stmt = db()->prepare("INSERT INTO ats_scans (user_id, filename, original_filename, file_path, score, analysis_json) VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([
+                        $_SESSION['user_id'],
+                        $filename,
+                        $file['name'],
+                        $filepath,
+                        0,
+                        json_encode($errorAnalysis, JSON_UNESCAPED_UNICODE)
+                    ]);
+                    
                     if ($isImageBased) {
                         flash('warning', 'PDF dosyanız görsel tabanlı (taranmış belge). ATS sistemleri bu dosyaları okuyamaz. <a href="pdf-help.php" style="color:#856404;text-decoration:underline;font-weight:600">Nasıl düzeltebileceğinizi öğrenin</a> veya DOCX formatında yükleyin.');
                     } else {
@@ -276,12 +288,25 @@ require_once 'header.php';
 .analysis-item.success{background:#d4edda}.analysis-item.warning{background:#fff3cd}.analysis-item.danger{background:#f8d7da}
 .analysis-item h4{margin:0 0 5px;display:flex;justify-content:space-between}
 .analysis-item p{margin:0;font-size:.9rem}
+.loading-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center}
+.loading-overlay.active{display:flex}
+.loading-content{background:#fff;padding:40px;border-radius:12px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,0.3)}
+.loading-spinner{width:60px;height:60px;border:6px solid #f3f3f3;border-top:6px solid var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 </style>
 
 <div class="page-header">
 <div class="container">
 <h1><i class="fas fa-search"></i> ATS Tarayıcı</h1>
 <p>CV'nizi yükleyin ve ATS uyumluluk skorunuzu öğrenin.</p>
+</div>
+</div>
+
+<div id="loadingOverlay" class="loading-overlay">
+<div class="loading-content">
+<div class="loading-spinner"></div>
+<h3 style="margin:0 0 10px;color:var(--primary)">CV Analiz Ediliyor...</h3>
+<p style="margin:0;color:var(--text-muted)">Lütfen bekleyin, dosyanız işleniyor.</p>
 </div>
 </div>
 
@@ -297,7 +322,7 @@ require_once 'header.php';
 <i class="fas fa-cloud-upload-alt"></i>
 <h3>CV Dosyanızı Yükleyin</h3>
 <p class="text-muted">PDF, DOC, DOCX veya TXT (Max 5MB)</p>
-<input type="file" name="cv_file" id="cv_file" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="document.getElementById('uploadForm').submit()">
+<input type="file" name="cv_file" id="cv_file" accept=".pdf,.doc,.docx,.txt" style="display:none" onchange="showLoading(); document.getElementById('uploadForm').submit()">
 </div>
 </form>
 
@@ -320,11 +345,23 @@ veya DOCX formatında yükleyin.
 <div class="card-header"><h3><i class="fas fa-history"></i> Geçmiş Taramalar</h3></div>
 <div class="card-body" style="padding:0">
 <table style="width:100%;border-collapse:collapse">
-<?php foreach($history as $h):?>
+<?php foreach($history as $h):
+$analysisData = json_decode($h['analysis_json'], true);
+$isError = isset($analysisData['error']) && $analysisData['error'];
+?>
 <tr style="border-bottom:1px solid var(--border)">
-<td style="padding:12px"><?=e($h['original_filename'])?></td>
+<td style="padding:12px">
+<?=e($h['original_filename'])?>
+<?php if($isError): ?>
+<br><small style="color:var(--danger)"><i class="fas fa-exclamation-circle"></i> <?=e($analysisData['message'])?></small>
+<?php endif; ?>
+</td>
 <td style="padding:12px;text-align:center">
+<?php if($isError): ?>
+<span style="background:var(--danger);color:#fff;padding:4px 12px;border-radius:15px;font-weight:600"><i class="fas fa-times"></i> Hata</span>
+<?php else: ?>
 <span style="background:<?=$h['score']>=70?'var(--success)':($h['score']>=50?'var(--warning)':'var(--danger)')?>;color:#fff;padding:4px 12px;border-radius:15px;font-weight:600"><?=$h['score']?>%</span>
+<?php endif; ?>
 </td>
 <td style="padding:12px;text-align:right;color:var(--text-muted);font-size:.85rem"><?=date('d.m.Y',strtotime($h['scanned_at']))?></td>
 </tr>
@@ -377,12 +414,17 @@ veya DOCX formatında yükleyin.
 </div>
 
 <script>
+function showLoading() {
+    document.getElementById('loadingOverlay').classList.add('active');
+}
+
 const dropArea = document.getElementById('dropArea');
 ['dragenter','dragover'].forEach(e => dropArea.addEventListener(e, () => dropArea.classList.add('dragover')));
 ['dragleave','drop'].forEach(e => dropArea.addEventListener(e, () => dropArea.classList.remove('dragover')));
 dropArea.addEventListener('drop', e => {
     e.preventDefault();
     document.getElementById('cv_file').files = e.dataTransfer.files;
+    showLoading();
     document.getElementById('uploadForm').submit();
 });
 dropArea.addEventListener('dragover', e => e.preventDefault());
