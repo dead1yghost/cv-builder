@@ -77,7 +77,7 @@
     .page-header p { margin: 0; opacity: 0.9; }
     
     /* Grid */
-    .row { display: flex; flex-wrap: wrap; margin: -15px; }
+    .row { display: flex; flex-wrap: nowrap; margin: -15px; gap: 10px; }
     .col { padding: 15px; }
     .col-6 { width: 50%; }
     .col-4 { width: 33.333%; }
