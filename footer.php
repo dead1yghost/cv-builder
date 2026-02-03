@@ -23,8 +23,8 @@
         });
     });
     
-    // Auto-hide alerts
-    document.querySelectorAll('.alert').forEach(alert => {
+    // Auto-hide alerts (except success alerts which may contain important links)
+    document.querySelectorAll('.alert-danger, .alert-warning').forEach(alert => {
         setTimeout(() => {
             alert.style.opacity = '0';
             setTimeout(() => alert.remove(), 300);
