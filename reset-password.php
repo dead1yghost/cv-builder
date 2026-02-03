@@ -57,52 +57,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check() && $validToken) {
 require_once 'header.php';
 ?>
 
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <i class="fas fa-lock"></i>
-            <h2>Şifre Sıfırla</h2>
-            <?php if ($validToken): ?>
-                <p>Merhaba <strong><?= e($user['full_name']) ?></strong>, yeni şifrenizi belirleyin.</p>
-            <?php endif; ?>
-        </div>
-        
-        <?php if ($error): ?>
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-circle"></i> <?= e($error) ?>
-            </div>
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-lock"></i> Şifre Sıfırla</h1>
+        <?php if ($validToken): ?>
+            <p>Merhaba <strong><?= e($user['full_name']) ?></strong>, yeni şifrenizi belirleyin.</p>
+        <?php else: ?>
+            <p>Şifrenizi sıfırlamak için yeni bir şifre belirleyin.</p>
         <?php endif; ?>
-        
-        <?php if ($validToken && !$success): ?>
-        <form method="POST" class="auth-form">
-            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-            
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-key"></i> Yeni Şifre (min. 6 karakter)
-                </label>
-                <input type="password" name="new_password" class="form-control" required 
-                       minlength="6" placeholder="••••••••">
+    </div>
+</div>
+
+<div class="container">
+    <div class="row" style="justify-content: center;">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <?= e($error) ?></div>
+                    <?php endif; ?>
+                    
+                    <?php if ($validToken && !$success): ?>
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                        
+                        <div class="form-group">
+                            <label class="form-label">Yeni Şifre (min. 6 karakter)</label>
+                            <input type="password" name="new_password" class="form-control" required 
+                                   minlength="6" placeholder="••••••••">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Yeni Şifre Tekrar</label>
+                            <input type="password" name="new_password2" class="form-control" required 
+                                   minlength="6" placeholder="••••••••">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <i class="fas fa-check"></i> Şifreyi Sıfırla
+                        </button>
+                    </form>
+                    
+                    <p class="text-center mt-2">
+                        <a href="login"><i class="fas fa-arrow-left"></i> Giriş sayfasına dön</a>
+                    </p>
+                    <?php endif; ?>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-key"></i> Yeni Şifre Tekrar
-                </label>
-                <input type="password" name="new_password2" class="form-control" required 
-                       minlength="6" placeholder="••••••••">
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-lg btn-block">
-                <i class="fas fa-check"></i> Şifreyi Sıfırla
-            </button>
-        </form>
-        <?php endif; ?>
-        
-        <div class="auth-footer">
-            <p>
-                <a href="login"><i class="fas fa-arrow-left"></i> Giriş sayfasına dön</a>
-            </p>
         </div>
     </div>
 </div>

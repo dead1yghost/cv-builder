@@ -108,48 +108,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && csrf_check()) {
 require_once 'header.php';
 ?>
 
-<div class="auth-container">
-    <div class="auth-card">
-        <div class="auth-header">
-            <i class="fas fa-key"></i>
-            <h2>Şifremi Unuttum</h2>
-            <p>E-posta adresinizi girin, size şifre sıfırlama linki gönderelim.</p>
-        </div>
-        
-        <?php if ($error): ?>
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-circle"></i> <?= e($error) ?>
+<div class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-key"></i> Şifremi Unuttum</h1>
+        <p>E-posta adresinizi girin, size şifre sıfırlama linki gönderelim.</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row" style="justify-content: center;">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-body">
+                    <?php if ($error): ?>
+                        <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> <?= e($error) ?></div>
+                    <?php endif; ?>
+                    
+                    <?php if ($success): ?>
+                        <div class="alert alert-success"><i class="fas fa-check-circle"></i> <?= $success ?></div>
+                    <?php endif; ?>
+                    
+                    <?php if (!$success): ?>
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
+                        
+                        <div class="form-group">
+                            <label class="form-label">E-posta Adresi</label>
+                            <input type="email" name="email" class="form-control" required 
+                                   placeholder="ornek@email.com" value="<?= e($_POST['email'] ?? '') ?>">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block btn-lg">
+                            <i class="fas fa-paper-plane"></i> Sıfırlama Linki Gönder
+                        </button>
+                    </form>
+                    
+                    <p class="text-center mt-2">
+                        <a href="login"><i class="fas fa-arrow-left"></i> Giriş sayfasına dön</a>
+                    </p>
+                    <?php endif; ?>
+                </div>
             </div>
-        <?php endif; ?>
-        
-        <?php if ($success): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i> <?= $success ?>
-            </div>
-        <?php endif; ?>
-        
-        <?php if (!$success): ?>
-        <form method="POST" class="auth-form">
-            <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
-            
-            <div class="form-group">
-                <label class="form-label">
-                    <i class="fas fa-envelope"></i> E-posta Adresi
-                </label>
-                <input type="email" name="email" class="form-control" required 
-                       placeholder="ornek@email.com" value="<?= e($_POST['email'] ?? '') ?>">
-            </div>
-            
-            <button type="submit" class="btn btn-primary btn-lg btn-block">
-                <i class="fas fa-paper-plane"></i> Sıfırlama Linki Gönder
-            </button>
-        </form>
-        <?php endif; ?>
-        
-        <div class="auth-footer">
-            <p>
-                <a href="login"><i class="fas fa-arrow-left"></i> Giriş sayfasına dön</a>
-            </p>
         </div>
     </div>
 </div>
