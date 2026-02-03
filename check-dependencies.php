@@ -4,6 +4,10 @@
  * Bu dosyayı sunucuda çalıştırarak composer bağımlılıklarını kontrol edin
  */
 
+// Güvenlik: Sadece giriş yapmış kullanıcılar erişebilir
+require_once 'config.php';
+requireLogin();
+
 header('Content-Type: text/plain; charset=utf-8');
 
 echo "=== CV Builder - Dependency Check ===\n\n";
@@ -12,11 +16,9 @@ echo "=== CV Builder - Dependency Check ===\n\n";
 $autoloadPath = __DIR__ . '/vendor/autoload.php';
 echo "1. Composer Autoload: ";
 if (file_exists($autoloadPath)) {
-    echo "✅ MEVCUT\n";
-    echo "   Path: $autoloadPath\n\n";
+    echo "✅ MEVCUT\n\n";
 } else {
     echo "❌ BULUNAMADI\n";
-    echo "   Path: $autoloadPath\n";
     echo "   Çözüm: SSH ile 'composer install' çalıştırın\n\n";
 }
 
@@ -109,4 +111,4 @@ foreach ($dirs as $name => $path) {
 
 echo "\n=== Kontrol Tamamlandı ===\n";
 echo "\nEğer PDF Parser yüklü değilse:\n";
-echo "SSH ile: cd " . __DIR__ . " && composer install\n";
+echo "SSH ile: composer install\n";
