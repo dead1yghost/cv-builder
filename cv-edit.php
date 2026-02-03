@@ -109,22 +109,292 @@ $tab = $_GET['tab'] ?? 'personal';
 require_once 'header.php';
 ?>
 <style>
-.editor{display:grid;grid-template-columns:220px 1fr;gap:25px;margin-top:20px}
-.sidebar{background:#fff;border-radius:12px;box-shadow:var(--shadow);overflow:hidden;position:sticky;top:90px;height:fit-content}
-.sidebar a{display:flex;align-items:center;gap:10px;padding:14px 18px;text-decoration:none;color:var(--text-dark);border-left:4px solid transparent}
-.sidebar a:hover{background:var(--bg-light)}
-.sidebar a.active{background:var(--secondary);border-left-color:var(--primary);font-weight:600;color:var(--primary)}
-.tab{display:none}.tab.active{display:block}
-.item{background:var(--bg-light);padding:15px 20px;border-radius:8px;margin-bottom:12px;position:relative}
-.item h4{margin:0 0 5px}.item p{margin:0;color:var(--text-muted);font-size:.9rem}
-.item .del{position:absolute;top:10px;right:10px;background:var(--danger);color:#fff;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer}
-.tags{display:flex;flex-wrap:wrap;gap:8px}
-.tag{background:var(--secondary);padding:6px 14px;border-radius:20px;display:flex;align-items:center;gap:6px;font-size:.9rem}
-.tag button{background:none;border:none;color:var(--danger);cursor:pointer;font-size:1.1rem}
-.colors{display:flex;gap:10px;flex-wrap:wrap}
-.colors div{width:40px;height:40px;border-radius:50%;cursor:pointer;border:3px solid transparent}
-.colors div.sel{border-color:#333}
-@media(max-width:768px){.editor{grid-template-columns:1fr}.sidebar{display:flex;flex-wrap:wrap}.sidebar a{flex:1;min-width:100px;border-left:none;border-bottom:3px solid transparent;justify-content:center}.sidebar a.active{border-bottom-color:var(--primary)}}
+.editor {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 30px;
+    margin-top: 30px;
+    margin-bottom: 40px;
+}
+
+.sidebar {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    position: sticky;
+    top: 90px;
+    height: fit-content;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    text-decoration: none;
+    color: var(--text-dark);
+    border-left: 4px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.sidebar a:hover {
+    background: var(--bg-light);
+}
+
+.sidebar a.active {
+    background: var(--secondary);
+    border-left-color: var(--primary);
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.sidebar a i {
+    width: 20px;
+    text-align: center;
+}
+
+.tab {
+    display: none;
+}
+
+.tab.active {
+    display: block;
+}
+
+.card {
+    margin-bottom: 0;
+}
+
+.card-body {
+    padding: 30px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.row {
+    margin-left: -10px;
+    margin-right: -10px;
+}
+
+.row > [class*="col-"] {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.item {
+    background: var(--bg-light);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.item h4 {
+    margin: 0 0 8px;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+}
+
+.item p {
+    margin: 0 0 5px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.item p:last-child {
+    margin-bottom: 0;
+}
+
+.item .del {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--danger);
+    color: #fff;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.item .del:hover {
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.tag {
+    background: var(--secondary);
+    padding: 8px 16px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    border: 1px solid rgba(0,0,0,0.05);
+}
+
+.tag button {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0;
+    margin-left: 4px;
+    transition: transform 0.2s ease;
+}
+
+.tag button:hover {
+    transform: scale(1.2);
+}
+
+.colors {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.colors div {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid transparent;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.colors div:hover {
+    transform: scale(1.1);
+}
+
+.colors div.sel {
+    border-color: #333;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #333;
+}
+
+hr {
+    margin: 30px 0;
+    border: none;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-lg {
+    padding: 12px 30px;
+    font-size: 1rem;
+}
+
+/* Inline forms for adding items */
+form[method="POST"]:not(.item form) {
+    margin-top: 20px;
+}
+
+/* Mobile responsive */
+@media (max-width: 992px) {
+    .editor {
+        grid-template-columns: 200px 1fr;
+        gap: 20px;
+    }
+    
+    .sidebar a {
+        padding: 14px 16px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .editor {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin-top: 20px;
+    }
+    
+    .sidebar {
+        position: static;
+        display: flex;
+        flex-wrap: wrap;
+        border-radius: 10px;
+    }
+    
+    .sidebar a {
+        flex: 1;
+        min-width: 120px;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+        justify-content: center;
+        padding: 12px 10px;
+        font-size: 0.85rem;
+    }
+    
+    .sidebar a.active {
+        border-left: none;
+        border-bottom-color: var(--primary);
+    }
+    
+    .card-body {
+        padding: 20px;
+    }
+    
+    .row > [class*="col-"] {
+        width: 100%;
+        margin-bottom: 0;
+    }
+    
+    .item {
+        padding: 15px;
+    }
+    
+    .item .del {
+        top: 10px;
+        right: 10px;
+        width: 28px;
+        height: 28px;
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar a {
+        min-width: 100px;
+        font-size: 0.8rem;
+        padding: 10px 8px;
+    }
+    
+    .sidebar a i {
+        font-size: 0.9rem;
+    }
+    
+    .card-body {
+        padding: 15px;
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+}
 </style>
 
 <div class="page-header">
@@ -225,17 +495,19 @@ require_once 'header.php';
 <!-- Skills -->
 <div class="tab <?=$tab==='skills'?'active':''?>">
 <div class="card"><div class="card-header"><h3>Beceriler</h3></div><div class="card-body">
-<div class="tags mb-2">
+<div class="tags">
 <?php foreach($skills as $s): ?>
 <span class="tag"><?=e($s['skill_name'])?> <small>(<?=e($s['category']?:'Genel')?>)</small>
 <form method="POST" style="display:inline"><input type="hidden" name="csrf_token" value="<?=csrf_token()?>"><input type="hidden" name="action" value="delete_skill"><input type="hidden" name="item_id" value="<?=$s['id']?>"><button type="submit">&times;</button></form></span>
 <?php endforeach; ?>
 </div>
-<form method="POST" style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
+<hr style="margin:25px 0">
+<h4 style="margin-bottom:20px"><i class="fas fa-plus"></i> Yeni Ekle</h4>
+<form method="POST" style="display:flex;gap:15px;flex-wrap:wrap;align-items:flex-end">
 <input type="hidden" name="csrf_token" value="<?=csrf_token()?>"><input type="hidden" name="action" value="add_skill">
-<div class="form-group" style="margin:0"><label class="form-label">Kategori</label><input type="text" name="category" class="form-control" style="width:140px" placeholder="Backend"></div>
-<div class="form-group" style="margin:0"><label class="form-label">Beceri *</label><input type="text" name="skill_name" class="form-control" required style="width:180px" placeholder="PHP"></div>
-<button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Ekle</button>
+<div class="form-group" style="margin:0;flex:1;min-width:180px"><label class="form-label">Kategori</label><input type="text" name="category" class="form-control" placeholder="Backend"></div>
+<div class="form-group" style="margin:0;flex:1;min-width:200px"><label class="form-label">Beceri *</label><input type="text" name="skill_name" class="form-control" required placeholder="PHP"></div>
+<button type="submit" class="btn btn-primary" style="height:fit-content"><i class="fas fa-plus"></i> Ekle</button>
 </form>
 </div></div>
 </div>
@@ -245,15 +517,17 @@ require_once 'header.php';
 <div class="card"><div class="card-header"><h3>Diller</h3></div><div class="card-body">
 <?php foreach($languages as $l): ?>
 <div class="item" style="display:flex;justify-content:space-between;align-items:center">
-<div><h4 style="margin:0"><?=e($l['language_name'])?></h4><p><?=e(ucfirst($l['proficiency']))?></p></div>
+<div><h4 style="margin:0"><?=e($l['language_name'])?></h4><p style="margin-top:4px"><?=e(ucfirst($l['proficiency']))?></p></div>
 <form method="POST"><input type="hidden" name="csrf_token" value="<?=csrf_token()?>"><input type="hidden" name="action" value="delete_language"><input type="hidden" name="item_id" value="<?=$l['id']?>"><button type="submit" class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button></form>
 </div>
 <?php endforeach; ?>
-<form method="POST" style="display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;align-items:flex-end">
+<hr style="margin:25px 0">
+<h4 style="margin-bottom:20px"><i class="fas fa-plus"></i> Yeni Ekle</h4>
+<form method="POST" style="display:flex;gap:15px;flex-wrap:wrap;align-items:flex-end">
 <input type="hidden" name="csrf_token" value="<?=csrf_token()?>"><input type="hidden" name="action" value="add_language">
-<div class="form-group" style="margin:0"><label class="form-label">Dil *</label><input type="text" name="language_name" class="form-control" required placeholder="İngilizce"></div>
-<div class="form-group" style="margin:0"><label class="form-label">Seviye</label><select name="proficiency" class="form-control"><option value="basic">Başlangıç</option><option value="intermediate" selected>Orta</option><option value="advanced">İleri</option><option value="native">Anadil</option></select></div>
-<button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Ekle</button>
+<div class="form-group" style="margin:0;flex:1;min-width:200px"><label class="form-label">Dil *</label><input type="text" name="language_name" class="form-control" required placeholder="İngilizce"></div>
+<div class="form-group" style="margin:0;flex:1;min-width:180px"><label class="form-label">Seviye</label><select name="proficiency" class="form-control"><option value="basic">Başlangıç</option><option value="intermediate" selected>Orta</option><option value="advanced">İleri</option><option value="native">Anadil</option></select></div>
+<button type="submit" class="btn btn-primary" style="height:fit-content"><i class="fas fa-plus"></i> Ekle</button>
 </form>
 </div></div>
 </div>
@@ -281,16 +555,18 @@ require_once 'header.php';
 <!-- Interests -->
 <div class="tab <?=$tab==='interests'?'active':''?>">
 <div class="card"><div class="card-header"><h3>İlgi Alanları</h3></div><div class="card-body">
-<div class="tags mb-2">
+<div class="tags">
 <?php foreach($interests as $i): ?>
 <span class="tag"><?=e($i['interest'])?>
 <form method="POST" style="display:inline"><input type="hidden" name="csrf_token" value="<?=csrf_token()?>"><input type="hidden" name="action" value="delete_interest"><input type="hidden" name="item_id" value="<?=$i['id']?>"><button type="submit">&times;</button></form></span>
 <?php endforeach; ?>
 </div>
-<form method="POST" style="display:flex;gap:10px;align-items:flex-end">
+<hr style="margin:25px 0">
+<h4 style="margin-bottom:20px"><i class="fas fa-plus"></i> Yeni Ekle</h4>
+<form method="POST" style="display:flex;gap:15px;align-items:flex-end;flex-wrap:wrap">
 <input type="hidden" name="csrf_token" value="<?=csrf_token()?>"><input type="hidden" name="action" value="add_interest">
-<div class="form-group" style="margin:0;flex:1"><label class="form-label">İlgi Alanı</label><input type="text" name="interest" class="form-control" required placeholder="Fotoğrafçılık"></div>
-<button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Ekle</button>
+<div class="form-group" style="margin:0;flex:1;min-width:250px"><label class="form-label">İlgi Alanı *</label><input type="text" name="interest" class="form-control" required placeholder="Fotoğrafçılık"></div>
+<button type="submit" class="btn btn-primary" style="height:fit-content"><i class="fas fa-plus"></i> Ekle</button>
 </form>
 </div></div>
 </div>
