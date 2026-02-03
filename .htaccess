@@ -1,0 +1,41 @@
+# CV Builder Pro - Apache Configuration
+
+# Rewrite Engine
+RewriteEngine On
+
+# Remove .php extension
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^(.*)$ $1.php [NC,L]
+
+# Protect sensitive files
+<FilesMatch "^(config|install)\.php$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Protect uploads directory from direct PHP execution
+<Directory "uploads">
+    <FilesMatch "\.php$">
+        Order allow,deny
+        Deny from all
+    </FilesMatch>
+</Directory>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>
+
+# PHP settings
+<IfModule mod_php.c>
+    php_value upload_max_filesize 10M
+    php_value post_max_size 12M
+    php_value max_execution_time 60
+</IfModule>
+
+# Error pages
+ErrorDocument 404 /index.php
+ErrorDocument 500 /index.php
