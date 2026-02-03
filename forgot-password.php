@@ -146,7 +146,7 @@ require_once 'header.php';
                         <input type="hidden" name="csrf_token" value="<?= csrf_token() ?>">
                         
                         <!-- Honeypot field for bot protection (hidden from users) -->
-                        <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="off">
+                        <input type="text" name="website" style="display:none;" tabindex="-1" autocomplete="new-password">
                         
                         <div class="form-group">
                             <label class="form-label">E-posta Adresi</label>
