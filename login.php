@@ -77,9 +77,11 @@ require_once 'header.php';
                         </button>
                     </form>
                     
+                    <?php if (ENABLE_PASSWORD_RESET): ?>
                     <p class="text-center mt-2">
                         <a href="forgot-password"><i class="fas fa-key"></i> Şifremi Unuttum</a>
                     </p>
+                    <?php endif; ?>
                     
                     <p class="text-center mt-2">
                         Hesabınız yok mu? <a href="register">Kayıt Olun</a>

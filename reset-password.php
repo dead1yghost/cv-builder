@@ -2,6 +2,12 @@
 $pageTitle = 'Şifre Sıfırla';
 require_once 'config.php';
 
+// Check if password reset is enabled
+if (!ENABLE_PASSWORD_RESET) {
+    flash('danger', 'Şifre sıfırlama özelliği şu anda devre dışı.');
+    redirect('login');
+}
+
 // If already logged in, redirect to dashboard
 if (isLoggedIn()) {
     redirect('dashboard');
