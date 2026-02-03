@@ -18,5 +18,5 @@ if (!$cv) {
 
 // Redirect to preview page with print prompt
 // The user can use browser's "Print to PDF" feature
-header("Location: cv-preview.php?id=$cvId&print=1");
+header("Location: cv-preview?id=$cvId&print=1");
 exit;

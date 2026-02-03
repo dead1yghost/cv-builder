@@ -131,8 +131,8 @@ require_once 'header.php';
 <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px">
 <div><h1><i class="fas fa-edit"></i> <?=e($cv['title'])?></h1></div>
 <div style="display:flex;gap:10px">
-<a href="cv-preview.php?id=<?=$cvId?>" class="btn btn-secondary" target="_blank"><i class="fas fa-eye"></i> Önizle</a>
-<a href="cv-download.php?id=<?=$cvId?>&type=pdf" class="btn btn-success"><i class="fas fa-download"></i> PDF</a>
+<a href="cv-preview?id=<?=$cvId?>" class="btn btn-secondary" target="_blank"><i class="fas fa-eye"></i> Önizle</a>
+<a href="cv-download?id=<?=$cvId?>&type=pdf" class="btn btn-success"><i class="fas fa-download"></i> PDF</a>
 </div>
 </div>
 </div>

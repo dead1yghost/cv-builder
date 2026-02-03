@@ -110,6 +110,7 @@
                     <li><a href="dashboard"><i class="fas fa-th-large"></i> Dashboard</a></li>
                     <li><a href="cv-list"><i class="fas fa-file-alt"></i> CV'lerim</a></li>
                     <li><a href="ats-scanner"><i class="fas fa-search"></i> ATS Tarayıcı</a></li>
+                    <li><a href="profile"><i class="fas fa-user-circle"></i> Profil</a></li>
                     <li><a href="logout"><i class="fas fa-sign-out-alt"></i> Çıkış</a></li>
                 <?php else: ?>
                     <li><a href="login"><i class="fas fa-sign-in-alt"></i> Giriş</a></li>
